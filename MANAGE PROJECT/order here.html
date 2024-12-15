@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brest Meals Order</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            color: #343a40;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 900px;
+        }
+        .card {
+            background-color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .scrollable-table {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .table thead {
+            background-color: #4a90e2;
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .meal-image {
+            max-width: 75px;
+            max-height: 75px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .receipt {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+        }
+        .total-section {
+            font-size: 1.3em;
+            color: #4a90e2;
+            border-top: 1px solid #e9ecef;
+            padding-top: 15px;
+        }
+        .footer {
+            background-color: #4a90e2;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mb-4 text-primary">🍽️ Brest Meals Order</h2>
+
+        <!-- Meals Table Card -->
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Available Meals</h4>
+                <div class="scrollable-table">
+                    <table class="table table-hover" id="mealsTable">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Meal</th>
+                                <th>Image</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Meals will be dynamically populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Section -->
+        <div class="receipt">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="text-primary">🧾 Your Order</h3>
+                <button id="clearCartBtn" class="btn btn-outline-danger btn-sm">Clear Cart</button>
+            </div>
+            <ul id="receiptList" class="list-group mb-3"></ul>
+            <div class="total-section d-flex justify-content-between">
+                <span>Total:</span>
+                <span>$<span id="totalPrice">0.00</span></span>
+            </div>
+        </div>
+
+        <!-- Checkout Section -->
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-4">🛒 Checkout</h3>
+                <form id="checkoutForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Delivery Address</label>
+                        <textarea class="form-control" id="address" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Place Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-4">
+        <p class="mb-0">&copy; 2024 Brest Meals. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Order Confirmation Modal -->
+    <div class="modal fade" id="orderConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">🎉 Order Confirmed!</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="orderConfirmBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Meals Data
+        const meals = [
+            { id: 1, name: 'Grilled Chicken Salad', price: 10, image: 'chicken-salad.jpg' },
+            { id: 2, name: 'Beef Burger with Fries', price: 15, image: 'beef-burger.jpg' },
+            { id: 3, name: 'Vegetable Soup', price: 8, image: 'images2025/food-1.jpg' },
+            { id: 4, name: 'Spaghetti Bolognese', price: 12, image: 'spaghetti.jpg' },
+            { id: 5, name: 'Caesar Salad', price: 9, image: 'caesar-salad.jpg' },
+            { id: 6, name: 'Fufu and Goatmeat', price: 25, image: 'caesar-salad.jpg' },
+            { id: 7, name: 'Bnaku and Tilapia', price: 10, image: 'caesar-salad.jpg' },
+            { id: 8, name: 'Chocolate Snack', price: 9, image: 'images2025/CHOCO.jpg' },
+            { id: 9, name: 'Mac and Cheese', price: 12, image: 'caesar-salad.jpg' },
+            { id: 10, name: 'Coca-Cola and Sandwich', price: 10, image: 'images2025/coca cola.jpg' },
+            { id: 11, name: 'Jollof and Chicken', price: 20, image: 'caesar-salad.jpg' }
+        ];
+
+        // DOM Elements
+        const mealsTable = document.getElementById('mealsTable').querySelector('tbody');
+        const receiptList = document.getElementById('receiptList');
+        const totalPriceElement = document.getElementById('totalPrice');
+        const clearCartBtn = document.getElementById('clearCartBtn');
+        const checkoutForm = document.getElementById('checkoutForm');
+        const orderConfirmModal = new bootstrap.Modal('#orderConfirmModal');
+        const orderConfirmBody = document.getElementById('orderConfirmBody');
+
+        // Render Meals
+        function renderMeals() {
+            mealsTable.innerHTML = meals.map(meal => `
+                <tr>
+                    <td><input type="checkbox" class="meal-checkbox" data-id="${meal.id}"></td>
+                    <td>${meal.name}</td>
+                    <td><img src="${meal.image}" alt="${meal.name}" class="meal-image"></td>
+                    <td>$${meal.price}</td>
+                    <td><input type="number" class="form-control meal-quantity" data-id="${meal.id}" min="1" value="1" disabled></td>
+                </tr>
+            `).join('');
+
+            // Add event listeners
+            document.querySelectorAll('.meal-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', handleMealSelection);
+            });
+
+            document.querySelectorAll('.meal-quantity').forEach(quantityInput => {
+                quantityInput.addEventListener('input', updateReceipt);
+            });
+        }
+
+        // Handle Meal Selection
+        function handleMealSelection(event) {
+            const checkbox = event.target;
+            const mealId = checkbox.dataset.id;
+            const quantityInput = document.querySelector(`.meal-quantity[data-id="${mealId}"]`);
+            quantityInput.disabled = !checkbox.checked;
+            updateReceipt();
+        }
+
+        // Update Receipt
+        function updateReceipt() {
+            receiptList.innerHTML = '';
+            let total = 0;
+
+            document.querySelectorAll('.meal-checkbox:checked').forEach(checkbox => {
+                const mealId = checkbox.dataset.id;
+                const meal = meals.find(m => m.id === parseInt(mealId));
+                const quantityInput = document.querySelector(`.meal-quantity[data-id="${mealId}"]`);
+                const quantity = parseInt(quantityInput.value);
+                const mealTotal = meal.price * quantity;
+
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                listItem.innerHTML = `
+                    ${meal.name} x ${quantity}
+                    <span class="badge bg-primary rounded-pill">$${mealTotal.toFixed(2)}</span>
+                `;
+                receiptList.appendChild(listItem);
+
+                total += mealTotal;
+            });
+
+            totalPriceElement.textContent = total.toFixed(2);
+        }
+
+        // Clear Cart
+        clearCartBtn.addEventListener('click', () => {
+            document.querySelectorAll('.meal-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelectorAll('.meal-quantity').forEach(quantityInput => {
+                quantityInput.value = 1;
+                quantityInput.disabled = true;
+            });
+            updateReceipt();
+        });
+
+        // Checkout
+        checkoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const total = parseFloat(totalPriceElement.textContent);
+            if (total === 0) {
+                alert('Please add items to your cart before placing an order.');
+                return;
+            }
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
+
+            const orderDetails = `
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Phone:</strong> ${phone}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Address:</strong> ${address}</p>
+                <hr>
+                <h5>Order Summary:</h5>
+                <ul class="list-group">
+                    ${receiptList.innerHTML}
+                </ul>
+                <p class="mt-3 text-end"><strong>Total: $${total.toFixed(2)}</strong></p>
+            `;
+
+            orderConfirmBody.innerHTML = orderDetails;
+            orderConfirmModal.show();
+
+            // Reset form and cart
+            checkoutForm.reset();
+            clearCartBtn.click();
+        });
+
+        // Initialize
+        renderMeals();
+    </script>
+</body>
+</html>
