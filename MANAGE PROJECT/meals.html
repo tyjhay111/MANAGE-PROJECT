@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ghanaian Restaurant Menu</title>
+  <title>Brest Restaurant Menu</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -78,6 +78,12 @@
       cursor: pointer;
       margin-top: 10px;
     }
+    .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
 
     .order-button:hover {
       background-color: #218838;
@@ -98,13 +104,16 @@
   </style>
 </head>
 <body>
+  
 
-  <h1>🍽️ Ghanaian Restaurant Menu</h1>
+  <h1>🍽️  Restaurant Menu</h1>
 
   <div class="search-container">
     <input type="text" id="searchInput" class="form-control" placeholder="Search for food items...">
     <button class="btn btn-success ml-2" onclick="searchMenu()">Search</button>
     <span id="loadingEmoji" class="loading-emoji">⏳</span>
+<a href="index.html" class="btn btn-danger logout-btn">Logout</a>
+
   </div>
 
   <div id="menuContainer" class="menu-container">
@@ -119,11 +128,12 @@
   <script>
     // Array containing menu items (dishes)
     const menuItems = [
-      { name: "Kelewele", category: "Starter", description: "Spiced fried plantains served with peanuts", availability: "Online", image: "https://via.placeholder.com/300x200?text=Kelewele" },
-      { name: "Groundnut Soup", category: "Soup", description: "Peanut-based soup served with rice balls or fufu", availability: "Offline", image: "https://via.placeholder.com/300x200?text=Groundnut+Soup" },
-      { name: "Jollof and chicken", category: "Main Dish", description: "Spiced rice cooked in a rich tomato sauce", availability: "Online", image: "https://via.placeholder.com/300x200?text=Jollof+and+Chicken" },
-      { name: "Waakye", category: "Main Dish", description: "Rice and beans served with plantains and salad", availability: "Offline", image: "https://via.placeholder.com/300x200?text=Waakye" },
-      { name: "Banku with Tilapia", category: "Main Dish", description: "Fermented corn dough with grilled tilapia and pepper sauce", availability: "Online", image: "https://via.placeholder.com/300x200?text=Banku+with+Tilapia" }
+      { name: "Kelewele", category: "Starter", description: "Spiced fried plantains served with peanuts", availability: "Online", image: "images2025/chow.jpg" },
+      { name: "Groundnut Soup", category: "Soup", description: "Peanut-based soup served with rice balls or fufu", availability: "Offline", image: "images2025/gohome.jpeg" },
+      { name: "Groundnut Soup", category: "Soup", description: "Peanut-based soup served with rice balls or fufu", availability: "Offline", image: "images2025/gohome.jpeg" },
+      { name: "Jollof and chicken", category: "Main Dish", description: "Spiced rice cooked in a rich tomato sauce", availability: "Online", image: "images2025/vaga.jpg" },
+      { name: "Waakye", category: "Main Dish", description: "Rice and beans served with plantains and salad", availability: "Offline", image: "images2025/chana.jpg" },
+      { name: "Banku with Tilapia", category: "Main Dish", description: "Fermented corn dough with grilled tilapia and pepper sauce", availability: "Online", image: "images2025/chicken pizza.jpg" }
     ];
 
     // Function to load all menu items into cards
@@ -144,6 +154,7 @@
           <p><strong>Description:</strong> ${item.description}</p>
           <div class="dish-status ${item.availability.toLowerCase()}">${item.availability}</div>
           <button class="order-button" onclick="placeOrder('${item.name}')">Order</button>
+          
         `;
 
         container.appendChild(card); // Add the card to the container
@@ -201,6 +212,23 @@
 
     // Load the menu when the page is loaded
     window.onload = loadMenu;
+    function getQueryParameter(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // Get the dish name from the URL and display it
+    document.addEventListener('DOMContentLoaded', () => {
+      const dishName = getQueryParameter('dish');
+      if (dishName) {
+        document.getElementById('dishName').textContent = dishName;
+      } else {
+        document.getElementById('dishName').textContent = 'Unknown Dish';
+      }
+    });
   </script>
+  
 </body>
 </html>
+
+
